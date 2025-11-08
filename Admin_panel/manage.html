@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage Content | Royal Event Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark px-3">
+    <div class="d-flex align-items-center">
+      <a class="navbar-brand" href="dashboard.html">← Dashboard</a>
+      <a id="liveChatNav" href="#" class="btn btn-sm btn-outline-light ms-2" title="Open Live Chat">Live Chat <span id="liveChatBadge" class="badge bg-danger ms-1" style="display:none">0</span></a>
+    </div>
+    <button id="logoutBtn" class="btn btn-danger btn-sm">Logout</button>
+  </nav>
+
+  <div class="container mt-4">
+    <h3 class="text-center mb-4">Manage Content</h3>
+
+    <ul class="nav nav-tabs" id="manageTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="venues-tab" data-bs-toggle="tab" data-bs-target="#venues" type="button" role="tab">Venues</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="portfolio-tab" data-bs-toggle="tab" data-bs-target="#portfolio" type="button" role="tab">Portfolio</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="members-tab" data-bs-toggle="tab" data-bs-target="#members" type="button" role="tab">Members</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button" role="tab">Bookings</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button" role="tab">Contacts</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="livechat-tab" data-bs-toggle="tab" data-bs-target="#livechat" type="button" role="tab">Live Chat</button>
+      </li>
+    </ul>
+
+    <div class="tab-content mt-3">
+      <div class="tab-pane fade show active" id="venues" role="tabpanel">
+        <div id="venuesList"></div>
+      </div>
+      <div class="tab-pane fade" id="portfolio" role="tabpanel">
+        <div id="portfolioList"></div>
+      </div>
+      <div class="tab-pane fade" id="members" role="tabpanel">
+        <div id="membersList"></div>
+      </div>
+      <div class="tab-pane fade" id="bookings" role="tabpanel">
+        <div id="bookingsList"></div>
+      </div>
+      <div class="tab-pane fade" id="contacts" role="tabpanel">
+        <div id="contactsList"></div>
+      </div>
+      <div class="tab-pane fade" id="livechat" role="tabpanel">
+        <div class="row">
+          <div class="col-md-4 border-end">
+            <div class="p-2">
+              <input id="chatSearch" class="form-control mb-2" placeholder="Search chats by name/phone" />
+              <div id="chatInbox" style="max-height:60vh; overflow:auto"></div>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="p-2">
+              <div id="chatThreadHeader" class="mb-2"></div>
+              <div id="chatThread" style="max-height:56vh; overflow:auto; background:#f8f9fa; padding:10px; border-radius:6px"></div>
+              <form id="adminReplyForm" class="mt-3 d-flex">
+                <input id="adminReplyInput" class="form-control me-2" placeholder="Type a reply..." />
+                <button class="btn btn-primary" type="submit">Send</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Edit Item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm">
+            <input type="hidden" id="editCollection" />
+            <input type="hidden" id="editId" />
+
+            <div id="editFields"></div>
+
+            <div class="text-end mt-3">
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/manage.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
