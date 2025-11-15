@@ -16,21 +16,20 @@
   <div class="container mt-4">
     <h3 class="text-center mb-4">Add New Venue</h3>
 
-        <form id="venueForm">
-  <input type="text" id="title" placeholder="Venue Title" required class="form-control mb-2" />
-  <input type="text" id="budget" placeholder="Budget" required class="form-control mb-2" />
-  <input type="text" id="location" placeholder="Location" required class="form-control mb-2" />
-  <textarea id="description" placeholder="Description" class="form-control mb-2"></textarea>
-    <!-- You can either provide a remote image URL (hosted elsewhere) OR upload files locally.
-         If you paste one or more URLs, separate them with commas. Local file upload is preferred. -->
-  <input type="file" id="images" name="images" accept="image/*" multiple class="form-control mb-2" />
-  <input type="text" id="imageURL" placeholder="Image URL (or comma-separated URLs) - optional" class="form-control mb-2" />
+    <form id="venueForm" class="bg-white shadow-sm p-3 rounded">
+      <input type="text" id="title" placeholder="Venue Title" required class="form-control mb-2" />
+      <input type="text" id="budget" placeholder="Budget" required class="form-control mb-2" />
+      <input type="text" id="location" placeholder="Location" required class="form-control mb-2" />
+      <textarea id="description" placeholder="Description" class="form-control mb-3" rows="4"></textarea>
 
-    <button type="submit">Add Venue</button>
+      <label for="images" class="form-label fw-semibold">Venue Images</label>
+      <input type="file" id="images" name="images" accept="image/*" multiple required class="form-control mb-3" />
+      <div class="form-text mb-3">Select one or more images. Files are uploaded to Cloudinary automatically.</div>
+
+      <button type="submit" class="btn btn-primary w-100">Add Venue</button>
     </form>
-  <p id="successMsg"></p>
 
-    <div id="message" class="text-center mt-3 text-success fw-bold"></div>
+    <div id="message" class="text-center mt-3 fw-bold"></div>
   </div>
 
   <script type="module" src="js/add-venue.js"></script>

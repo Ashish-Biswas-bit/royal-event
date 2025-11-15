@@ -1,8 +1,8 @@
 // admin-panel/js/add-venue.js
-import { auth, db, storage } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+import { uploadFileList } from "./cloudinary.js";
 
 const form = document.getElementById("venueForm");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -29,54 +29,36 @@ form.addEventListener("submit", async (e) => {
   const location = document.getElementById("location").value.trim();
   const budget = document.getElementById("budget").value.trim();
   const description = document.getElementById("description").value.trim();
-  // Support either local file uploads or external image URLs
   const imagesInput = document.getElementById("images");
   const files = imagesInput ? imagesInput.files : [];
-  const imageURLInput = document.getElementById("imageURL").value.trim();
+  const submitBtn = form.querySelector('[type="submit"]');
 
-  if (!title || !location || !budget || !description || (files.length === 0 && !imageURLInput)) {
-    message.textContent = "⚠️ Please fill all fields and provide at least one image (upload files or provide URL)!";
+  if (!title || !location || !budget || !description) {
+    message.textContent = "⚠️ Please fill in every field.";
+    return;
+  }
+
+  if (!files || files.length === 0) {
+    message.textContent = "⚠️ Select at least one image to upload.";
+    return;
+  }
+
+  const budgetValue = Number(budget);
+  if (Number.isNaN(budgetValue)) {
+    message.textContent = "⚠️ Budget must be a valid number.";
     return;
   }
 
   try {
-    message.textContent = "⏳ Processing images...";
+    message.textContent = "⏳ Uploading images to Cloudinary...";
+    message.classList.remove("text-success");
+    message.classList.remove("text-danger");
+    message.classList.add("text-info");
+    if (submitBtn) submitBtn.disabled = true;
 
-    // Step 1: Determine image URLs (upload files if present, otherwise use provided URLs)
-    const imageUrls = [];
-    if (files && files.length > 0) {
-      for (const file of files) {
-        const imgRef = ref(storage, `venues/${Date.now()}_${file.name}`);
-        await uploadBytes(imgRef, file);
-        const url = await getDownloadURL(imgRef);
-        imageUrls.push(url);
-      }
-    } else {
-      const urls = imageURLInput.split(",").map(u => u.trim()).filter(Boolean);
-      imageUrls.push(...urls);
-    }
+    const imageUrls = await uploadFileList(files, { folder: "venues" });
 
-    // Normalize Google Drive share links into direct-view links so browsers can embed them.
-    function normalizeDriveUrl(u) {
-      if (!u || typeof u !== 'string') return u;
-      try {
-        if (!/drive\.google\.com/.test(u)) return u;
-        // Try to extract a file id from common patterns
-        const idMatch = u.match(/[-\w]{25,}/);
-        if (!idMatch) return u; // can't extract
-        const fileId = idMatch[0];
-        // prefer the uc?export=view form which is embeddable when file is shared
-        return `https://drive.google.com/uc?export=view&id=${fileId}`;
-      } catch (e) {
-        return u;
-      }
-    }
-
-    for (let i = 0; i < imageUrls.length; i++) {
-      imageUrls[i] = normalizeDriveUrl(imageUrls[i]);
-    }
-
-  // Ensure user is authenticated (helpful when rules require auth)
+    // Ensure user is authenticated (helpful when rules require auth)
     const user = auth.currentUser;
     if (!user) {
       throw new Error("User not authenticated. Firestore rules may require authentication.");
@@ -95,17 +77,26 @@ form.addEventListener("submit", async (e) => {
     await addDoc(collection(db, "venues"), {
       title,
       location,
-      budget: Number(budget),
+      budget: budgetValue,
       description,
       images: imageUrls,
       createdAt: serverTimestamp()
     });
 
     message.textContent = "✅ Venue added successfully!";
+    message.classList.remove("text-info");
+    message.classList.remove("text-danger");
+    message.classList.add("text-success");
     form.reset();
   } catch (err) {
     console.error(err);
     message.textContent = "❌ Error: " + err.message;
+    message.classList.remove("text-info");
+    message.classList.remove("text-success");
+    message.classList.add("text-danger");
+  }
+  finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 });
 

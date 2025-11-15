@@ -1,0 +1,14 @@
+[
+	{
+		"task": "Summarize conversation history and key pending items",
+		"status": "done"
+	},
+	{
+		"task": "Implement Cloudinary-based uploads across admin forms (configure credentials in cloudinary-config.js)",
+		"status": "done"
+	},
+	{
+		"task": "Extend manage panel edits to support Cloudinary uploads for venues, portfolio, and members",
+		"status": "done"
+	}
+]

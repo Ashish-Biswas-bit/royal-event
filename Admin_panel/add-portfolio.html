@@ -15,18 +15,22 @@
   <div class="container mt-4">
     <h3 class="text-center mb-4">Add New Portfolio</h3>
 
-    <form id="portfolioForm">
+    <form id="portfolioForm" class="bg-white shadow-sm p-3 rounded">
       <input type="text" id="title" placeholder="Portfolio Title" required class="form-control mb-2" />
-      <textarea id="description" placeholder="Description" required class="form-control mb-2"></textarea>
-      <input type="text" id="imageURL" placeholder="Image URL(s) - comma separated" required class="form-control mb-2" />
+      <textarea id="description" placeholder="Description" required class="form-control mb-3" rows="4"></textarea>
+
+      <label for="portfolioImages" class="form-label fw-semibold">Portfolio Images</label>
+      <input type="file" id="portfolioImages" name="portfolioImages" accept="image/*" multiple required class="form-control mb-3" />
+      <div class="form-text mb-3">Upload one or more showcase images. Files are stored in Cloudinary.</div>
+
       <input type="text" id="client" placeholder="Client / Venue Name" class="form-control mb-2" />
       <input type="text" id="category" placeholder="Category (Wedding / Corporate / Birthday)" class="form-control mb-2" />
-      <input type="date" id="date" class="form-control mb-2" />
+      <input type="date" id="date" class="form-control mb-3" />
 
-      <button type="submit" class="btn btn-primary">Add Portfolio</button>
+      <button type="submit" class="btn btn-primary w-100">Add Portfolio</button>
     </form>
 
-    <div id="message" class="text-center mt-3 text-success fw-bold"></div>
+    <div id="message" class="text-center mt-3 fw-bold"></div>
   </div>
 
   <script type="module" src="js/add-portfolio.js"></script>

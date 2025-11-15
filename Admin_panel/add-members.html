@@ -15,16 +15,24 @@
   <div class="container mt-4">
     <h3 class="text-center mb-4">Add New Team Member</h3>
 
-    <form id="memberForm">
+    <form id="memberForm" class="bg-white shadow-sm p-3 rounded">
       <input type="text" id="name" placeholder="Full Name" required class="form-control mb-2" />
       <input type="text" id="designation" placeholder="Designation / Position" required class="form-control mb-2" />
-      <textarea id="bio" placeholder="Short Bio / Responsibilities" class="form-control mb-2"></textarea>
-      <input type="text" id="photoURL" placeholder="Photo URL" class="form-control mb-2" />
+      <textarea id="bio" placeholder="Short Bio / Responsibilities" class="form-control mb-3" rows="4"></textarea>
 
-      <button type="submit" class="btn btn-primary">Add Team Member</button>
+      <input type="tel" id="phone" placeholder="Phone (optional)" class="form-control mb-2" />
+      <input type="email" id="email" placeholder="Email (optional)" class="form-control mb-2" />
+      <input type="url" id="facebook" placeholder="Facebook profile link" class="form-control mb-2" />
+      <input type="url" id="instagram" placeholder="Instagram profile link" class="form-control mb-3" />
+
+      <label for="photo" class="form-label fw-semibold">Profile Photo</label>
+      <input type="file" id="photo" name="photo" accept="image/*" required class="form-control mb-3" />
+      <div class="form-text mb-3">Upload a headshot. The image is stored in Cloudinary.</div>
+
+      <button type="submit" class="btn btn-primary w-100">Add Team Member</button>
     </form>
 
-    <div id="message" class="text-center mt-3 text-success fw-bold"></div>
+    <div id="message" class="text-center mt-3 fw-bold"></div>
   </div>
 
   <script type="module" src="js/add-members.js"></script>

@@ -19,40 +19,128 @@
   </nav>
 
   <div class="container mt-4">
-    <h3 class="mb-4 text-center">Dashboard Overview</h3>
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-3">
+      <div>
+        <h3 class="mb-0">Dashboard Overview</h3>
+        <p class="text-muted mb-0 small">Realtime snapshot of venues, bookings, and team activity.</p>
+      </div>
+      <div class="text-lg-end">
+        <a href="add-venue.html" class="btn btn-primary m-1">Add Venue</a>
+        <a href="add-portfolio.html" class="btn btn-success m-1">Add Portfolio</a>
+        <a href="add-members.html" class="btn btn-info m-1">Add Team Member</a>
+        <a href="manage.html" class="btn btn-outline-secondary m-1">Manage Content</a>
+        <a href="notifications.html" class="btn btn-warning m-1">Notifications</a>
+        <a href="messenger.html" class="btn btn-secondary m-1">Messenger</a>
+      </div>
+    </div>
+
+    <div id="dashboardStatus" class="text-center small text-muted my-3 d-none"></div>
 
     <div class="row g-3">
       <div class="col-md-3 col-6">
-        <div class="card text-center shadow-sm p-3">
-          <h4 id="venueCount">0</h4>
-          <p>Total Venues</p>
+        <div class="card text-center shadow-sm p-3 h-100 border-start border-4 border-primary-subtle">
+          <h4 id="venueCount" class="mb-0">0</h4>
+          <p class="mb-0 small text-muted">Total Venues</p>
         </div>
       </div>
       <div class="col-md-3 col-6">
-        <div class="card text-center shadow-sm p-3">
-          <h4 id="bookingCount">0</h4>
-          <p>Total Bookings</p>
+        <div class="card text-center shadow-sm p-3 h-100 border-start border-4 border-success-subtle">
+          <h4 id="bookingCount" class="mb-0">0</h4>
+          <p class="mb-0 small text-muted">Total Bookings</p>
         </div>
       </div>
       <div class="col-md-3 col-6">
-        <div class="card text-center shadow-sm p-3">
-          <h4 id="portfolioCount">0</h4>
-          <p>Portfolio Items</p>
+        <div class="card text-center shadow-sm p-3 h-100 border-start border-4 border-info-subtle">
+          <h4 id="portfolioCount" class="mb-0">0</h4>
+          <p class="mb-0 small text-muted">Portfolio Items</p>
         </div>
       </div>
       <div class="col-md-3 col-6">
-        <div class="card text-center shadow-sm p-3">
-          <h4 id="memberCount">0</h4>
-          <p>Total Members</p>
+        <div class="card text-center shadow-sm p-3 h-100 border-start border-4 border-warning-subtle">
+          <h4 id="memberCount" class="mb-0">0</h4>
+          <p class="mb-0 small text-muted">Total Members</p>
         </div>
       </div>
     </div>
 
-    <div class="mt-5 text-center">
-      <a href="add-venue.html" class="btn btn-primary m-2">Add Venue</a>
-      <a href="add-portfolio.html" class="btn btn-success m-2">Add Portfolio</a>
-      <a href="add-members.html" class="btn btn-info m-2">Add Team Member</a>
-  <a href="manage.html" class="btn btn-outline-secondary m-2">Manage Content</a>
+    <div class="row g-3 mt-1">
+      <div class="col-md-4 col-12">
+        <div class="card text-center shadow-sm p-3 border border-warning-subtle bg-warning-subtle bg-opacity-10">
+          <h5 id="bookingPendingCount" class="mb-1 text-warning">0</h5>
+          <p class="mb-0 small text-muted">Pending bookings</p>
+        </div>
+      </div>
+      <div class="col-md-4 col-12">
+        <div class="card text-center shadow-sm p-3 border border-success-subtle bg-success-subtle bg-opacity-10">
+          <h5 id="bookingAcceptedCount" class="mb-1 text-success">0</h5>
+          <p class="mb-0 small text-muted">Accepted bookings</p>
+        </div>
+      </div>
+      <div class="col-md-4 col-12">
+        <div class="card text-center shadow-sm p-3 border border-danger-subtle bg-danger-subtle bg-opacity-10">
+          <h5 id="bookingRejectedCount" class="mb-1 text-danger">0</h5>
+          <p class="mb-0 small text-muted">Rejected bookings</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+      <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Recent Bookings</h5>
+              <a href="manage.html#bookings" class="small">View all</a>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col">Guest</th>
+                    <th scope="col">Venue</th>
+                    <th scope="col">Event Date</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Created</th>
+                  </tr>
+                </thead>
+                <tbody id="recentBookingsBody">
+                  <tr><td colspan="5" class="text-center text-muted py-3">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Latest Enquiries</h5>
+              <a href="manage.html#contacts" class="small">View all</a>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Received</th>
+                  </tr>
+                </thead>
+                <tbody id="recentContactsBody">
+                  <tr><td colspan="4" class="text-center text-muted py-3">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

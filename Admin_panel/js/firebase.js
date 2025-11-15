@@ -8,7 +8,7 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCaEBz1pw-TmuAe3spqUQv6YCiraLSiPoo",
-  authDomain: "royal-event-admin-74d4c.firebaseapp.com",
+  authDomain: "royal-event-admin-74d4c.web.app",
   databaseURL: "https://royal-event-admin-74d4c-default-rtdb.firebaseio.com",
   projectId: "royal-event-admin-74d4c",
   storageBucket: "royal-event-admin-74d4c.appspot.com",

@@ -1,0 +1,55 @@
+<!-- admin-panel/notifications.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications | Royal Event Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="dashboard.html">Royal Event Admin</a>
+      <div class="d-flex gap-2">
+        <a href="dashboard.html" class="btn btn-outline-light btn-sm">Dashboard</a>
+        <button id="logoutBtn" class="btn btn-danger btn-sm">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container my-4">
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-3">
+      <div>
+        <h3 class="mb-1">Notifications</h3>
+        <p class="text-muted mb-0 small">Track the latest bookings and enquiries. <span id="notificationSummaryCount">0</span> updates available.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <select id="notificationFilter" class="form-select form-select-sm" style="min-width: 180px;">
+          <option value="all">All activity</option>
+          <option value="booking">Bookings</option>
+          <option value="contact">Enquiries</option>
+        </select>
+        <button id="refreshNotificationsBtn" class="btn btn-outline-secondary btn-sm">Refresh</button>
+      </div>
+    </div>
+
+    <div id="notificationStatus" class="alert d-none" role="alert"></div>
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Latest updates</h5>
+        <small id="notificationLastUpdated" class="text-muted"></small>
+      </div>
+      <div class="card-body p-0">
+        <div id="notificationsList" class="list-group list-group-flush">
+          <div class="list-group-item text-muted">Loading notifications...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/notifications.js"></script>
+</body>
+</html>
