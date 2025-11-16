@@ -125,9 +125,12 @@ let venuesUnsubscribe = null;
 let knownVenueIds = new Set();
 let venuesInitialLoadComplete = false;
 let presenceHeartbeatTimer = null;
+let presenceHiddenTimer = null;
 let presenceTrackedUid = null;
 let presenceVisibilityAttached = false;
+let presenceUnloadAttached = false;
 const PRESENCE_INTERVAL_MS = 45000;
+const PRESENCE_HIDDEN_OFFLINE_DELAY_MS = 60000;
 
 function refreshNotificationDropdown(){
   if (!notificationList) return;
@@ -1075,13 +1078,17 @@ function startPresenceHeartbeat(user){
   if (presenceTrackedUid === user.uid && presenceHeartbeatTimer) {
     return;
   }
-  stopPresenceHeartbeat();
+  stopPresenceHeartbeat({ markOffline: false });
+  if (presenceHiddenTimer) {
+    window.clearTimeout(presenceHiddenTimer);
+    presenceHiddenTimer = null;
+  }
   presenceTrackedUid = user.uid;
-  sendPresenceHeartbeat().catch((err) => {
+  sendPresenceHeartbeat({ markOnline: true }).catch((err) => {
     console.warn('Initial presence heartbeat failed', err);
   });
   presenceHeartbeatTimer = window.setInterval(() => {
-    sendPresenceHeartbeat().catch((err) => {
+    sendPresenceHeartbeat({ markOnline: true }).catch((err) => {
       console.warn('Presence heartbeat failed', err);
     });
   }, PRESENCE_INTERVAL_MS);
@@ -1089,35 +1096,85 @@ function startPresenceHeartbeat(user){
     document.addEventListener('visibilitychange', handlePresenceVisibilityChange);
     presenceVisibilityAttached = true;
   }
+  if (!presenceUnloadAttached) {
+    window.addEventListener('pagehide', handlePresencePageHide);
+    presenceUnloadAttached = true;
+  }
 }
 
-function stopPresenceHeartbeat(){
+function stopPresenceHeartbeat({ markOffline = true } = {}){
   if (presenceHeartbeatTimer) {
     window.clearInterval(presenceHeartbeatTimer);
     presenceHeartbeatTimer = null;
   }
+  if (presenceHiddenTimer) {
+    window.clearTimeout(presenceHiddenTimer);
+    presenceHiddenTimer = null;
+  }
+  const trackedUid = presenceTrackedUid;
   presenceTrackedUid = null;
   if (presenceVisibilityAttached) {
     document.removeEventListener('visibilitychange', handlePresenceVisibilityChange);
     presenceVisibilityAttached = false;
   }
+  if (presenceUnloadAttached) {
+    window.removeEventListener('pagehide', handlePresencePageHide);
+    presenceUnloadAttached = false;
+  }
+  if (markOffline && trackedUid) {
+    markPresenceOffline(trackedUid).catch((err) => {
+      console.warn('Presence offline update failed', err);
+    });
+  }
 }
 
 function handlePresenceVisibilityChange(){
   if (document.visibilityState === 'visible') {
-    sendPresenceHeartbeat().catch(() => {});
+    if (presenceHiddenTimer) {
+      window.clearTimeout(presenceHiddenTimer);
+      presenceHiddenTimer = null;
+    }
+    sendPresenceHeartbeat({ markOnline: true }).catch(() => {});
+  } else if (document.visibilityState === 'hidden') {
+    if (presenceHiddenTimer) {
+      window.clearTimeout(presenceHiddenTimer);
+    }
+    presenceHiddenTimer = window.setTimeout(() => {
+      markPresenceOffline().catch(() => {});
+    }, PRESENCE_HIDDEN_OFFLINE_DELAY_MS);
   }
 }
 
-async function sendPresenceHeartbeat(){
+async function sendPresenceHeartbeat({ markOnline = true } = {}){
   if (!presenceTrackedUid) return;
+  const payload = {
+    lastActiveAt: serverTimestamp()
+  };
+  if (markOnline) {
+    payload.isOnline = true;
+  }
   try {
-    await setDoc(doc(db, 'users', presenceTrackedUid), {
-      lastActiveAt: serverTimestamp()
+    await setDoc(doc(db, 'users', presenceTrackedUid), payload, { merge: true });
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function markPresenceOffline(targetUid = null){
+  const uid = targetUid || presenceTrackedUid;
+  if (!uid) return;
+  try {
+    await setDoc(doc(db, 'users', uid), {
+      lastActiveAt: serverTimestamp(),
+      isOnline: false
     }, { merge: true });
   } catch (err) {
     throw err;
   }
+}
+
+function handlePresencePageHide(){
+  markPresenceOffline().catch(() => {});
 }
 
 function formatMessageTime(ts){

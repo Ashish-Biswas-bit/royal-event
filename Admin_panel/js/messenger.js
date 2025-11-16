@@ -22,6 +22,8 @@ const replyForm = document.getElementById("messengerReplyForm");
 const replyInput = document.getElementById("messengerReplyInput");
 const searchInput = document.getElementById("messengerSearch");
 const unreadBadge = document.getElementById("messengerUnreadBadge");
+const totalThreadsStat = document.getElementById("messengerTotalValue");
+const awaitingThreadsStat = document.getElementById("messengerAwaitingValue");
 
 let unsubscribeChat = null;
 let initialSnapshotComplete = false;
@@ -89,6 +91,9 @@ function startMessenger() {
 
 function renderThreadList(threads) {
   if (!threadListEl) return;
+  const totalThreads = threads.length;
+  const awaitingThreads = threads.reduce((count, thread) => count + (thread.unread ? 1 : 0), 0);
+  updateThreadStats(totalThreads, awaitingThreads);
   if (!threads.length) {
     threadListEl.innerHTML = '<div class="text-center text-muted py-5 small">No conversations yet.</div>';
     return;
@@ -177,25 +182,46 @@ function renderConversation(thread, { autoScroll = false, markRead = false } = {
   `;
 
   if (!thread.messages.length) {
-    conversationEl.innerHTML = '<div class="text-center text-muted py-5 small">No messages in this thread yet.</div>';
+    conversationEl.innerHTML = `
+      <div class="messenger-conversation-placeholder">
+        <span class="placeholder-icon" aria-hidden="true">✉️</span>
+        <h6 class="mb-1">No messages yet</h6>
+        <p class="text-muted mb-0">Send the first reply to kick off this conversation.</p>
+      </div>
+    `;
   } else {
-    const bubbles = thread.messages.map((message) => {
+    let lastDayLabel = "";
+    const rows = [];
+    thread.messages.forEach((message) => {
       const isAdmin = !!message.fromAdmin;
-      const who = isAdmin ? "You" : (message.name || thread.name || "Guest");
+      const authorName = message.name || thread.name || "Guest";
+      const displayLabel = isAdmin ? "You" : authorName;
+      const avatarLabel = isAdmin ? (message.name || "Admin") : authorName;
       const stamp = resolveTimestamp(message.createdAt);
-      const timeLabel = stamp ? formatTimestamp(stamp) : "";
-      const bubbleClasses = isAdmin ? "messenger-bubble admin" : "messenger-bubble visitor";
-      return `
-        <div class="${bubbleClasses}">
-          <div class="messenger-bubble-meta small text-muted">
-            <span>${escapeHtml(who)}</span>
-            ${timeLabel ? `<span class="dot">•</span><span>${escapeHtml(timeLabel)}</span>` : ""}
+      const dayLabel = formatDayLabel(stamp);
+      if (dayLabel && dayLabel !== lastDayLabel) {
+        rows.push(`<div class="messenger-day-divider"><span>${escapeHtml(dayLabel)}</span></div>`);
+        lastDayLabel = dayLabel;
+      }
+      const timeLabel = formatBubbleTime(stamp);
+      const rowClass = `messenger-bubble-row ${isAdmin ? "admin" : "visitor"}`;
+      const bubbleClass = `messenger-bubble ${isAdmin ? "admin" : "visitor"}`;
+      rows.push(`
+        <div class="${rowClass}">
+          <div class="bubble-avatar" aria-hidden="true">${escapeHtml(extractInitial(avatarLabel || displayLabel))}</div>
+          <div class="bubble-inner">
+            <div class="messenger-bubble-meta">
+              <span class="bubble-author">${escapeHtml(displayLabel)}</span>
+              ${timeLabel ? `<span class="dot">•</span><span>${escapeHtml(timeLabel)}</span>` : ""}
+            </div>
+            <div class="${bubbleClass}">
+              <div class="messenger-bubble-body">${escapeHtml(message.text || "")}</div>
+            </div>
           </div>
-          <div class="messenger-bubble-body">${escapeHtml(message.text || "")}</div>
         </div>
-      `;
-    }).join("");
-    conversationEl.innerHTML = bubbles;
+      `);
+    });
+    conversationEl.innerHTML = rows.join("");
   }
 
   if (autoScroll) {
@@ -232,7 +258,13 @@ function setConversationPlaceholder() {
       <p class="mb-0 text-muted small">Choose a visitor on the left to review their messages and reply.</p>
     </div>
   `;
-  conversationEl.innerHTML = '<div class="text-center text-muted py-5 small">No conversation selected.</div>';
+  conversationEl.innerHTML = `
+    <div class="messenger-conversation-placeholder">
+      <span class="placeholder-icon" aria-hidden="true">💬</span>
+      <h6 class="mb-1">No conversation selected</h6>
+      <p class="text-muted mb-0">Choose a visitor on the left to review their messages and reply.</p>
+    </div>
+  `;
 }
 
 if (replyForm) {
@@ -416,6 +448,29 @@ function formatTimestamp(date) {
   return date.toLocaleString();
 }
 
+function formatDayLabel(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+  const today = new Date();
+  const sameYear = today.getFullYear() === date.getFullYear();
+  const options = sameYear
+    ? { month: "short", day: "numeric" }
+    : { month: "short", day: "numeric", year: "numeric" };
+  return date.toLocaleDateString(undefined, options);
+}
+
+function formatBubbleTime(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function extractInitial(label) {
+  if (!label) return "?";
+  const str = String(label).trim();
+  if (!str) return "?";
+  const match = str.match(/[A-Za-z0-9]/);
+  return (match ? match[0] : str[0]).toUpperCase();
+}
+
 function truncateText(str, maxLength) {
   const value = (str || "").trim();
   if (value.length <= maxLength) return value;
@@ -429,6 +484,18 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function updateThreadStats(total, awaiting) {
+  if (totalThreadsStat) totalThreadsStat.textContent = formatStatValue(total);
+  if (awaitingThreadsStat) awaitingThreadsStat.textContent = formatStatValue(awaiting);
+}
+
+function formatStatValue(value) {
+  if (!Number.isFinite(value)) return "0";
+  const safe = Math.max(0, Math.floor(value));
+  if (safe > 999) return "999+";
+  return String(safe);
 }
 
 function setStatus(message, tone = "warning") {
@@ -459,7 +526,8 @@ function listenToVerifiedUsers() {
         uid: docSnap.id,
         displayName: data.displayName || null,
         email: data.email || null,
-        lastActiveAt: resolveTimestamp(data.lastActiveAt)
+        lastActiveAt: resolveTimestamp(data.lastActiveAt),
+        isOnline: typeof data.isOnline === "boolean" ? data.isOnline : null
       });
     });
     renderThreadList(currentThreads);
@@ -485,7 +553,9 @@ function getPresenceStatus(presence) {
   if (!presence) return null;
   const lastActive = presence.lastActiveAt ? presence.lastActiveAt.getTime() : 0;
   const now = Date.now();
-  const isOnline = lastActive && (now - lastActive) <= ONLINE_THRESHOLD_MS;
+  const computedOnline = lastActive && (now - lastActive) <= ONLINE_THRESHOLD_MS;
+  const hasRealtimeFlag = typeof presence.isOnline === "boolean";
+  const isOnline = hasRealtimeFlag ? presence.isOnline : !!computedOnline;
   const label = isOnline ? "Online" : "Offline";
   const className = isOnline ? "bg-success-subtle text-success" : "bg-secondary";
   const lastSeenLabel = presence.lastActiveAt
