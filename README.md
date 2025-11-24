@@ -40,7 +40,7 @@ package.json
    npx serve .
    ```
    Then visit `http://localhost:8080/Admin_panel/index.html` or `user_view/index.html`.
-5. **Run locally:**
+5. **Run Publicly:**
     - Visit 'https://royal-event-admin-74d4c.web.app/?t=1731771234'
 ## Configuration
 - **Firebase:** Config is in `js/firebase.js` (both admin and user). Update with your Firebase project credentials if needed.
