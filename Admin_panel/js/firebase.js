@@ -7,14 +7,14 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCaEBz1pw-TmuAe3spqUQv6YCiraLSiPoo",
-  authDomain: "royal-event-admin-74d4c.web.app",
-  databaseURL: "https://royal-event-admin-74d4c-default-rtdb.firebaseio.com",
-  projectId: "royal-event-admin-74d4c",
-  storageBucket: "royal-event-admin-74d4c.appspot.com",
-  messagingSenderId: "237293686255",
-  appId: "1:237293686255:web:e6aae8ae0eb07e9aa07a1a",
-  measurementId: "G-LHTZ535RHB"
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
+  measurementId: ""
 };
 
 // Initialize Firebase
